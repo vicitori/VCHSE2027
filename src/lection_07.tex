@@ -1,568 +1,245 @@
-\def\letus{%
-    \mathord{\setbox0=\hbox{$\exists$}%
-             \hbox{\kern 0.125\wd0%
-                   \vbox to \ht0{%
-                      \hrule width 0.75\wd0%
-                      \vfill%
-                      \hrule width 0.75\wd0}%
-                   \vrule height \ht0%
-                   \kern 0.125\wd0}%
-           }%
-}
+\section{Лекция 7 05.05.25}
+Линейное уравнение Вольтерры II рода:
+\[y(x) -  \int_{a}^{x} K(x,s)y(s) \,ds  = f(x),\space x\in[a,b] \] 
+Нелинейное уравнение Вольтерры II рода:
+\[y(x) -  \int_{a}^{x} K(x,s,y(s)) \,ds  = f(x),\space x\in[a,b] \] 
+\(K(x,s)\) --- ядро интегрального уравнения; уравнение интегральное, т.к. \(y(x)\) стоит под знаком интеграла.\\
+Линейное уравнение Фредгольма II рода: 
+\[y(x) -  \lambda\int_{a}^{b} K(x,s)y(s) \,dx  = f(x),\space x\in[a,b] \] 
+// Уравнение Вольтерры I рода: \( f(t) = \mathlarger{\int}_{a}^{x} K(x,s)y(s)\,ds\)\\// Вольтерры с точки зрения математики --- частный случай Фредгольма.\\\\
+\underline{Откуда возникают эти уравнения}\\
+К сожалению, у нас плохие знания физики; например, уравнение Фредгольма II рода описывает колебательные движения нити, на которую действуют некие силы, а более простое интегральное уравнение --- её прогиб.
+\begin{itemize}
+    \item \textbf{Простой пример:} И.Г.Петровский <<Лекции по теории интегральных уравнений>>
+    \item Очень большой обзор: С.Г. Михлин <<Приложения интегральных уравнений к проблемам механики, матфизики и техники>> (1947г)
+\end{itemize}
+Михлин --- математик, но тогда еще вычмат неразрывно связан с физикой, а сейчас про приложения в книгах по вычам не пишут.
+\subsection{Уравнения Вольтерры}
+Известно, что:
+\begin{enumerate}
+    \item \( f \equiv 0\) (однородное уравнение) --- только тривиальное решение
+    \item Если \(f(x) \in C[a,b]\) и \(K(x,s)\) непр. в $\triangle \, \begin{cases} 
+    x=b\\
+    x=s\\
+    s=a
+    \end{cases} \Rightarrow \exists!$ решение
+\end{enumerate}
+\textbf{!} Вообще говоря, рассматривая все последующие численные методы, мы исходим из предположения $\exists$ и $!$ решения.
+\[y(x) -  \int_{a}^{x} K(x,s)y(s) \,ds  = f(x) \]
+\subsubsection{Метод квадратур}
+Замена интеграла квадратурной суммой: 
+\[\int_{a}^{b} g(x) \,dx = \sum_{i=0}^{n}w_ig(x_i) + R; \, a\le x_0\le x_1 \le ...\le x_n\le b\]
+где $w_i$ --- веса, а $R$ --- ошибка.\\Подставим для \(i=0,1,..,n\) \space \(x=x_i\):
+\[y(x_i) -  \int_{a}^{x_i} K(x_i,s)y(s) \,ds  = f(x_i) \]
+Этот интеграл уже можно заменить квадратурной суммой:
+\[y(x_i)-\sum_{j=0}^{i}w_jK(x_i,x_j)y(x_j)=f(x_i) + R_i\]
+(сумма до $i$, a не до $n$, т.к. интеграл до $x$)\\
+Пусть \( K(x_i,x_j)=K_{ij}, f(x_i)=f_i, y(x_i)=y_i\); и отбросим $R_i$, считая их малыми:
+\[y_i-\sum_{j=0}^{i}w_jK_{ij}y_j=f_i;\, i=0,1,..,n\]
+Перепишем в виде
+\[ \sum_j^{i-1}w_jK_{ij}y_j+(1-w_iK_{ii})y_i=f_i \Rightarrow\]
+\[ \Rightarrow \begin{pmatrix}
+1-w_0K_{00}  \\
+-w_0K_{10}&1-w_1K_{11}& &\mbox{\Huge 0}\\
+\vdots & \vdots & \ddots &\\
+-w_0K_{n0}&-w_1K_{n1}&\cdots&1-w_nK_{nn}\\
+\end{pmatrix} \begin{pmatrix}
+y_0\\
+y_1\\
+\vdots\\
+y_n
+\end{pmatrix} = \begin{pmatrix}
+f_0\\
+f_1\\
+\vdots\\
+f_n
+\end{pmatrix} \]
+Решение: 
+\[y_i=\frac{f_i+\mathlarger{\sum}_{j=0}^{i-1}w_jK_{ij}y_j}{1-w_iK_{ii}}	\rightsquigarrow \textrm{ последовательно находим по этой формуле}\]
+\(1-w_iK_{ii}\ne 0 \iff w_i \ne \frac{1}{K_{ii}}\) --- добиться выбором узлов кв. ф.\\\\
+\underline{Упражнение:} на равномерной сетке с шагом $h$ при использовании метода трапеций формула имеет вид:
+\[y_i=\frac{f_i+\frac{h}{2}K_{i0}{y_0} +h\mathlarger{\sum}_{j=1}^{i-1}K_{ij}y_j}{1-\frac{h}{2}K_{ii}}\]
+Ну а после того, как вычислили $y(x_i)$, можно применить интерполяцию и вычислить в остальных точках.\\\\
+\underline{Замечание:} \begin{itemize}
+    \item численное интегрирование применили
+    \item СЛАУ применили
+    \item интерполяцию применили
+\end{itemize}
+Сами по себе эти задачи не всегда ценны, но как часть целого --- более чем.
 
-\section{Лекция 7 14.04.25}
-\subsection{Численные методы линейной алгебры}
+\subsubsection{Метод квадратур для нелинейного уравнения}
+\[y(x) -  \int_{a}^{x} K\mathlarger{(}x,s,y(s)\mathlarger{)} \,ds  = f(x),\space x\in[a,b] \] 
+Исходим из предположения $\exists$ и $!$ решения
+\[y(x_i) -  \int_{a}^{x_i} K\mathlarger{(}x,s,y(s)\mathlarger{)} \,ds  = f(x_i)\]
+Заменяем конечными суммами:
+\[y_i - \sum_{j=0}^{i}w_jK_{ij}(y_j) = f_i \]
+\[y_i - w_iK_{ii}(y_i) = f_i + \sum_{j=0}^{i-1}w_jK_{ij}(y_j) \]
+$	\rightsquigarrow$ последовательное решение нелинейных уравнений (а их мы на самой первой паре решали!)
 
-Рассмотрим систему \( Ax = b \), \( A \) — неособенная
-
-\begin{tabular}{c|}
-     \(A \rightarrow A \) + \( \Delta A \)\\
-     \(b \rightarrow b \) + \( \Delta b \)
-\end{tabular}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (3.1,0.7) {%
-    \begin{minipage}{10cm}
-    \(\Rightarrow \tilde{x} = x + \Delta x \text{ - возмущение системы}\)
-    \end{minipage}
-  };
-}
-
-\[(A + \Delta A)(x + \Delta x) =b + \Delta b\]
-
-Тогда
-\(\Delta A x + (A + \Delta A) \Delta x = \Delta b\)
-
-\leftskip=1.2cm \(\Delta A (x + \Delta x) + A \Delta x = \Delta b\)
-
-\leftskip=1.2cm \(\Delta A \tilde{x} + A \Delta x = \Delta b \Rightarrow \Delta x = A^{-1}(-\Delta A \tilde{x} + \Delta b) \Rightarrow\)
-\[\Rightarrow \| \Delta x \| \leq \| A^{-1} \| (\| \Delta A \| \| \tilde{x} \| + \| \Delta b \|)\]
-
-\[\frac{\| \Delta x \|}{\| \tilde{x} \|} \leq \| A^{-1} \| \left(\| \Delta A \| + \frac{\| \Delta b \|}{\| \tilde{x} \|}\right) = \| A^{-1} \| \| A \| \left(\frac{\| \Delta A \|}{\| A \|} + \frac{\| \Delta b \|}{\| A \| \cdot \| \tilde{x} \|}\right)\]
-
-огрубим оценку \(\| A \| \cdot \| \tilde{x} \| \geq \| A \tilde{x} \| \approx \| b \|\)
-
-
-\[\frac{\| \Delta x \|}{\| \tilde{x} \|} \leq \| A^{-1} \| \| A \| \left(\frac{\| \Delta A \|}{\| A \|} + \frac{\| \Delta b \|}{\| b \|}\right)\]
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (3.75,0) {%
-    \begin{minipage}{10cm}
-    \swarrow
-    \end{minipage}
-  };
-} 
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (9.25,0.5) {%
-    \begin{minipage}{10cm}
-    \searrow
-    \end{minipage}
-  };
-}
-
-
-\tikz[remember picture, overlay]{
-\node[anchor=west] at (-0.5,0.5) {%
-    \begin{minipage}{10cm}
-    ошибка в решении
-    \end{minipage}
-  };
-  \node[anchor=west] at (5,1) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (3.5,0) {%
-    \begin{minipage}{10cm}
-    коэф-т распре-\\деления ошибки
-    \end{minipage}
-  };
-  \node[anchor=west] at (9.75,0.5) {%
-    \begin{minipage}{10cm}
-    \(\text{ошибка от } b\)
-    \end{minipage}
-  };
-  \node[anchor=west] at (7.5,1) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (6.75,0.5) {%
-    \begin{minipage}{10cm}
-    \(\text{ошибка от } A\)
-    \end{minipage}
-  };
-}
-
-
-\[\text{cond}(A) = \| A^{-1} \| \cdot \| A \| \text{ - число обусловленности матрицы}\]
-
-\( A\) — особенная \rightarrow \[\text{cond}(A) = +\infty \quad (\text{т.к. } \| A^{-1} \|\] неограниченно возрастает при приближении к особенной)
-
-\underline{Замечание:} \(\text{cond}(A) = \| A^{-1} \| \cdot \| A \| \geq \| A^{-1}A \| = \| E \| = 1 \Rightarrow \text{cond}(A) \geq 1 \quad \forall A\)
-
-Если \(\text{cond}(A)\) невелико, то матрица \textbf{хорошо обусловлена}, иначе \textbf{плохо обусловлена}
-
-\underline{Примеры}\quad 1) \( Q \) - ортогональная, т.е. \( QQ^T = E \)
-
-\[\text{рассмотрим норму: }\|x\|_2 = \sqrt{\sum_{i=1}^n |x_i|^2}, \|A\|_2 = \sup_{\|x\|_2=1} \|Ax\|\]
-
-из алгебры известно, что для ортогональной \(Q\) верно \(\|Qx\|_2 = \|x\|_2\) \Rightarrow
-
-\begin{tabular}{c|}
-\[\Rightarrow \|Q\|_2 = \sup_{\|x\|_2=1} \|Qx\| = \sup_{\|x\|=1} \|x\|_2 = 1\]\\
-\[\|Q^{-1}\|_2 = /Q^{-1}=Q^T/ = \|Q^T\|_2 = \|Q\|_2 = 1\]
-\end{tabular}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (9,0.6) {%
-    \begin{minipage}{10cm}
-    \(\Rightarrow\text{cond}_2(Q)=1\)
-    \end{minipage}
-  };
-}
-
-Если \( R = dQ \), где \( Q \) - ортогональная, то \(\text{cond}_2(R) = 1\)
-
-\underline{Примеры ортогональных матриц:}
-
+\subsubsection{Метод простой итерации}
+\[y(x) = f(x) +  \int_{a}^{x} K(x,s)y(s) \,ds ,\space x\in[a,b] \] 
+\[y_k(x) = f(x) +  \int_{a}^{x} K(x,s)y_{k-1}(s) \,ds \textrm{ --- схема итераций} \]
+Известно, что \begin{enumerate}
+    \item при \(f(x) \in C[a,b]\) и \( K(x,s) \in C(\triangle \,\,\, a\le s\le x \le b)\) поточечно сходится к единственному решению при любом начальном приближении $y_0(x)$
+    \item часто используют \(y_0(x) = f(x)\)
+    \item скорость сходимости зависит от $K(x,s)$ и $f(x)$
+\end{enumerate}
+\underline{Численно:}\space
+\(y_k(x_i) = f(x_i) +  \mathlarger{\int}_{a}^{x_i} K(x_i,s)y_{k-1}(s) \,ds \) $\rightarrow$ квадратурные суммы (на равномерной сетке)
+\subsection{Линейное уравнение Фредгольма II рода}
+\[y(x) -  \lambda\int_{a}^{b} K(x,s)y(s) \,ds  = f(x),\space x\in[a,b] \] 
+Известно, что если \(\begin{cases}
+    1)f\in C[a,b]\\
+    2)K(x,s)\in C([a,b] \times[a,b])\\
+    3)\textrm{при } f \equiv 0 \textrm{ имеется только тривиальное решение}(\Rightarrow \lambda \textrm{ регулярное}) \\
+\end{cases}\\\Rightarrow \forall f(x)\) у интегрального уравнения Фредгольма II рода $\exists!$ непрерывное решение\\\\
+\underline{Частные случаи:} \begin{enumerate}
+    \item $K(x,s) = K(x-s)$ --- разностное ядро
+    \item \(K(x,s) =\mathlarger{\sum}_{i=1}^{m}\alpha_{i}(x)\beta_{i}(s)\)--- вырожденное ядро ($\{\alpha_i\}, \{\beta_{i}\}$ --- ЛНЗ семейства)
+\end{enumerate}
+В таких случаях есть особые методы решения.
+\subsubsection{Метод решения уравнения с вырожденным ядром}
+\[y(x) -  \lambda\int_{a}^{b} \mathlarger{[}\sum_{i=1}^{m}\alpha_{i}(x)\beta_{i}(s)\mathlarger{]}y(s) \,ds  = f(x),\space x\in[a,b] \] 
+Вытащим то, что не зависит от $s$ за знак интеграла:
+\begin{align}
+y(x) -  \lambda\sum_{i=1}^{m}\alpha_{i}(x)\int_{a}^{b} \beta_{i}(s)y(s) \,ds  = f(x) \tag{$\star$} \label{eq:star}
+\end{align}
+Пусть \(c_i=\mathlarger{\int}_a^b \beta_i(s)y(s)\,ds\) --- мы как-то научились их вычислять, тогда\\ \(y(x)=f(x) +\lambda \mathlarger{\sum}_{i=1}^mc_i\alpha_i(x),\space x\in[a,b]\). \underline{Никакой интерполяции.}\\
+Подставим $y(x)$ в уравнение \eqref{eq:star}:
+\[\sum_{i=1}^m\alpha_i(x)\mathlarger{\{} c_i-\int_a^b \beta_i(s)\mathlarger{[} f(s) + \lambda \sum_{j=1}^m c_j\alpha_j(s)\mathlarger{]}\,ds \mathlarger{\}} =0\]
+т.к. $\{\alpha_i(x)\}_{i=1}^m$ --- ЛНЗ, все коэффициенты равны 0:
+\[c_i-\int_a^b\beta_i(s)\mathlarger{[}f(s)+\lambda\sum_{j=1}^mc_j\alpha_j(s)\mathlarger{]}\, ds=0;\, i=1,..,m \]
+\[c_i-\lambda\sum_{j=1}^m c_j\int_a^b \alpha_j(s)\beta_i(s)\,ds=\int_a^b\beta_i(s)f(s)\,ds\]
+\[ a_{ij}=\int_a^b\alpha_j(s)\beta_i(s)\,ds;\, f_i=\int_a^b\beta_i(s)f(s)\,ds\]
+\[c_i-\lambda\sum_{j=1}^ma_{ij}c_j=f_i\]
 \[
 \begin{pmatrix}
-1 & 0 \\
-0 & 1
-\end{pmatrix},
-\quad
+    1-\lambda a_{11} & -\lambda a_{12} & \cdots & -\lambda a_{1n}\\
+    -\lambda a_{21} & 1-\lambda a_{22} & \cdots & -\lambda a_{2n}\\
+    \cdots & \cdots & \cdots & \cdots\\
+    -\lambda a_{m1} & -\lambda a_{m2} & \cdots & 1-\lambda a_{mm}
+\end{pmatrix}
 \begin{pmatrix}
-1 & 0 \\
-0 & -1
-\end{pmatrix},
-\quad
+    c_1\\c_2\\ \vdots \\ c_n
+\end{pmatrix}
+=
 \begin{pmatrix}
-\cos\theta & -\sin\theta \\
-\sin\theta & \cos\theta
+    f_1\\ f_2 \\ \vdots \\f_n
 \end{pmatrix}
 \]
-
-\textbf{Неформальный вывод:} ортогональные матрицы очень хорошо подходят для вычислительных алгоритмов
-
-2) \( H = (h_{ij}) = \frac{1}{i+j+1} \) — матрицы Гильберта
-
-\[ H_3 = 
-\begin{pmatrix}
-1 & \frac{1}{2} & \frac{1}{3} \\
-\frac{1}{2} & \frac{1}{3} & \frac{1}{4} \\
-\frac{1}{3} & \frac{1}{4} & \frac{1}{5}
-\end{pmatrix} \]
-
-\[ \begin{aligned}
-\text{cond}_1 (H_2) &\approx 19.3 \\
-\text{cond}_2 (H_3) &\approx 524 \\
-\text{cond}_2 (H_n) &\approx O\left(\frac{34^n}{\sqrt{n}}\right)
-\end{aligned} \]
-
-3) \( V_n \) — матрицы Вандермонда
-
-\[ \text{cond}_2 (V_h) \geq \sqrt{2} \frac{(1 + \sqrt{2})^{n-1}}{\sqrt{n+1}} \text{— экспоненциальный рост}\]
-
-4) Пример системы уравнений:
-
+Известно, что если $\lambda$ --- регулярное, то система разрешима.\\
+\underline{Итог:} \begin{itemize}
+    \item вычисляем интегралы $a_{ij}$
+    \item решаем СЛАУ
+    \item получаем ответ \(y(x)=f(x)+\lambda \mathlarger{\sum}_{i=1}^m c_i\alpha_i(x)\)
+\end{itemize}
+\underline{Замечание:}\\
+Если ядро невырожденное, но достаточно гладкое, его можно приблизить вырожденным.\\
+\underline{Пример:}
+\[y(x)+\int_0^1x(e^{xs}-1)y(s)\,ds=e^x-x\]
+Известно, что есть решение y(x) \equiv 1.\\
+\(K(x,s)=x(e^{xs}-1)\) --- невырожденное ядро. Но, разложив $e^{xs}$ в ряд Тейлора, получим вырожденное ядро.
+\subsubsection{Метод сплайн-коллокаций}
+Изучить самостоятельно дома и сделать задачку.
+\subsection{Уравнение Фредгольма I рода}
+А теперь рассмотрим уравнение Фредгольма I рода в условиях $\exists!$ решения:
+\[ \int_a^bK(x,s)z(s)\,ds=u(x),\, \begin{cases}
+    c\le x\le d\\
+    z(s)\in C[a,b]\\
+    u(x)\in L_2[c,d)\\
+    \frac{\partial K}{\partial x}\in C \left ( \left \{ 
+        \begin{align*}
+  a\le x\le b \\ 
+  c \le x \le d
+\end{align*}
+    \right \} \right ) 
+\end{cases}\]
+Попробуем применить предложенные методы (квадратур, сплайн-коллокаций) и ничего не выйдет...
+\begin{itemize}
+    \item почему?
+    \item что делать?
+\end{itemize}\\
+\underline{Похожие примеры:}\\\\
+\textcircled{\small{1}}\\
 \[ \begin{cases}
-u + 10v = 11 \\
-100u + 1001v = 1101
-\end{cases}
-\Rightarrow 
-\begin{cases}
-u = 1 \\
-v = 1
-\end{cases} \]
-
+        z_1+7z_2=5\\
+        \sqrt{2}z_1+\sqrt{98}z_2 = \sqrt{50}
+    \end{cases} \rightarrow\ \begin{cases}
+        z_1 = 0,1\\
+        z_2 = 0,7
+    \end{cases} \]
+Оставив два знака после запятой у коэффициентов при $z_1$ и $z_2$, получим:
 \[ \begin{cases}
-u + 10v = 11.01 \\
-100u + 1001v = 1101
-\end{cases}
-\Rightarrow 
-\begin{cases}
-u = 11.01 \\
-v = 0
-\end{cases} \]
-
-\underline{Упр:} убедиться, что число обусловленности матрицы системы весьма велико
-
-\vspace{10mm}
-\underline{Определение:} Квадратная матрица имеет \textit{диагональное преобладание}, если \(\forall i=1..n\)
-\[ |a_{ii}| \geq \sum_{j\neq i} |a_{ij}| \]
-и хотя бы одно неравенство является строгим. Если все неравенства строги, то имеется \textbf{строгое диагональное преобладание} (далее рассматриваем только его)
-
-\underline{Th} (Адамар) (алгебра)
-Матрица со строгим диагональным преобладанием неособенна
-
-\underline{Th} (Алберг-Нильсон)
-Пусть \(A\) — квадратная матрица с диагональным преобладанием
-\[\letus \alpha = \min_{1 \leq i \leq n} \left\{ |a_{ij}| - \sum_{j\neq i} |a_{ij}| \right\} \text{ - количественная мера д.п.}\]
-Тогда \( \|A^{-1}\|_{\infty} \leq \frac{1}{\alpha} \) и, как следствие, \( \text{cond}_{\infty}(A) \leq \frac{1}{\alpha} \|A\|_{\infty}\)
-
-\vspace{10mm}
-Напоминание: \[ \|A\|_{\infty} = \max_{1 \leq i \leq n} \sum_{j=1}^{n} |a_{ij}|, \quad \|x\|_{\infty} = \max_{1 \leq i \leq n} |x_i|\quad \text{Чебышёвская норма}\]
-\vspace{10mm}
-
-5) построение кубического сплайна
-
-\[ \frac{1}{6}
-\begin{pmatrix} 
-2(h_1+h_2) & h_2 & 0 & \cdots & 0 \\ 
-h_2 & 2(h_2+h_3) & h_3 & \ddots & \vdots \\ 
-0 & h_3 & 2(h_3+h_4) & \ddots & 0 \\ 
-\vdots & \ddots & \ddots & \ddots & h_{n-1} \\ 
-0 & \cdots & 0 & h_{n-1} & d(h_{n-1}+h_n) 
-\end{pmatrix} 
-\]
-
-\(\text{мера диагонального преобладания: } \frac{1}{6} min \left\{ 2h_1 + h_2, 2h_n + h_{n-1}, min_{2 \leq i \leq 2n} \left( h_i + h_{i+1} \right) \right\} \quad (v)\)
-
-\(\text{норма: } \frac{1}{6} max \left\{ 2h_1 + 3h_2, 2h_n + 3h_{n+1}, 3max_{2 \leq i \leq 2n} \left( h_i + h_{i+1} \right) \right\} \quad (w)\)
-
-\[\letus h_i = h=const \quad (v) = \frac{1}{3} h, (w) = h \implies \text{cond}_{\infty}(A) \leq 3\]
-
-Ещё один аргумент, что кубический сплайн — "хороший" объект
-
-6) \( A = \begin{pmatrix} x & 0 & \cdots & 0 \\ 0 & x & \ddots & \vdots \\ \vdots & \ddots & \ddots & \vdots \\ 0 & \cdots & \cdots & x\end{pmatrix} \)  
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (5,1.75) {%
-    \begin{minipage}{10cm}
-    \(\rightarrow \text{cond}(A)\text{ может быть сколь угодно большим}\)
-    \end{minipage}
-  };
-}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (5,1.5) {%
-    \begin{minipage}{10cm}
-    \(\rightarrow \text{система решается тривиально}\)
-    \end{minipage}
-  };
-}
-
-Высокая обусловленность не влечёт высокой чувствительности конкретной матрицы к конкретному возмущению
-
-В частных случаях возможны альтернативные метрики
-
-\underline{Example: } Калиткин, Юхно, Кузьмина "Количественный критерий обусловленности систем линейных алгебраических уравнений"; журнал "Математическое моделирование"; \href{https://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=mm&paperid=3070&option_lang=rus}{ссылка}
-
-
-\subsection{Решение СЛАУ}
-
-\( Ax = b \): метод Гаусса и в путь
-
-\vspace{5mm}
-Направления борьбы:
+        z_1+7z_2=5\\
+        1,41z_1+9,9z_2 = \sqrt{50}
+    \end{cases} \rightarrow\ \begin{cases}
+        z_1 = \frac{1}{3}\\
+        z_2 = \frac{2}{3}
+    \end{cases} \]
+\[ \textrm{50 знаков:}\begin{cases}
+        z_1 = 9,666..\\
+        z_2 = 0.666..
+    \end{cases} 
+    \space
+    \textrm{200 знаков:}\begin{cases}
+        z_1 = -5,5\\
+        z_2 = 1,5
+    \end{cases} \]
+Процесс никуда не сходится; малые возмущения исходных значений приводят к сильным возмущениям системы.\\
+\textcircled{\small{2}} (c ним столкнулся Адамар)
+\[\begin{cases}
+    \frac{\partial^2u}{\partial x^2} + \frac{\partial^2u}{\partial y^2}=0\\
+    u(x,0)=f(x)\\
+    $\left.{\frac{\partial u}{\partial y}}\right|_{y=0}$ = \phi(x)\\
+\end{cases}, \textrm{где } u, f, \phi \textrm{ непрерывны на своих областях определения}\]\\
+$	\rightsquigarrow$ задача Коши для уравнения Лапласа\\\\
+\(1^o) \begin{cases}
+    f_1(x) \equiv 0\\
+    \phi_1(x)\ = \frac{1}{a}sin(ax)
+\end{cases} \Rightarrow u_1(x,y)=\frac{1}{a^2}sin(ax)sh(ay)\)\\
+\(2^o) \begin{cases}
+    f_2(x) \equiv 0\\
+    \phi_2(x) \equiv0
+\end{cases} \Rightarrow u_2(x,y)\equiv0\)
+\[\rho_C(f_1,f_2)=\sup_{x}|f_1(x)-f_2(x)|=0\]
+\[\rho_C(\phi_1,\phi_2)=\sup_{x}|\phi_1(x)-\phi_2(x)|=\frac{1}{a} \xrightarrow{a\rightarrow\infty}{0}\]
+\[\rho_C(u_1,u_2)=\sup_{x,y}\left |\frac{1}{a^2}sin(ax)sh(ay)\right |= \sup_y\frac{1}{a^2}sh(ay)\xrightarrow{a\rightarrow\infty}{+\infty}\]
+Снова малые возмущения данных краевой задачи сильно исказили решение.\\
+Кажется, что мы готовы только к тем задачам, где нет <<искажений>>.\\\\
+\underline{Определение:}\\
+\(Az=u, \textrm{ где } z\in Z,\space u\in U,\space  A:Z\rightarrow U \) --- непрерывный оператор,\\
+задача корректно поставлена (по Адамару), если \begin{enumerate}
+    \item уравнение разрешимо $\forall u\in U$
+    \item решение единственно
+    \item решение устойчиво к возмущениям, т.е. малым возмущениям u в метрике U соответствуют малые возмущения z в метрике Z
+\end{enumerate}\\
+\underline{Что у уравнений Фредгольма I рода?}\\
+Пусть при  \(u=u_0(x)\) имеем решение \( z=z_0(x)\) и пусть \(u_{N,w}(x)=u_0(x)+N\mathlarger{\int}_a^bK(x,s)sin\,ws\,ds\).
+Рассмотрим \(z_{N,w}(s)=z_0(s)+Nsin\,ws\,\):
+\[\rho_U(u_{N,w}, u_0)=|N| \left (\mathlarger{\int}_c^d \left [ \int_a^b K(x,s)sin\,ws\,ds \right ]^2\,dx \right )^\frac{1}{2} \xrightarrow{w\rightarrow \infty}{0}\]
+\[\int_a^b K(x,s)sin\,ws\,ds \xrightarrow{w\rightarrow \infty}{0} \textrm{ (теория рядов Фурье)}\]
+\[\rho_Z(z_{N,w},z_0) = \max_{S\in[a,b]} |Nsin\,ws|=N \sNeg[1mu]{\xrightarrow{w\rightarrow\infty}}0  \]
+\(\Rightarrow\) задача поставлена некорректно (хотя бы потому, что проблемы с устойчивостью).\\\\
+Некорректно поставленные задачи делятся на \begin{enumerate}
+    \item регулярные (по Тихонову)
+    \item нерегулярные
+\end{enumerate}\\
+\underline{Идея регуляризации}\\
+Решить операторное уравнение \(Az=u\rightsquigarrow ||Au-z||_2^2+\alpha||u||_2\rightarrow \min\)\\
+(минимизация первого слагаемого $\rightarrow$ минимизация невязки, неустойчивость;\\ минимизация второго слагаемого $\rightarrow$ повышение устойчивости, увеличение невязки;\\$\alpha$ --- коэффициент регуляризации (используется для балансировки))\\
+$\rightsquigarrow$ решить новое операторное уравнение \((A^TA+\alpha L)z_{\alpha}=A^Tu\),
+где $L$ --- симметричный и положительно определенный оператор.\\
+Оказывается, что тут будет устойчивость.\\
+Выбор $\alpha$: тоже целая теория.\\
+А.Н. Тихонов, А.С.Леонов, А.Г. Ягола <<Нелинейные некорректные задачи>> (1995г.)\\\\
+A.M. Wazwaz "The regularisation method for Fredholm Integral Equation of the I kind"  (2011г.):\\
+ур-е I рода \(\mathlarger{\int}_a^bK(x,t)u(t)\,dt \rightarrow \alpha u_{\alpha}(x)+\mathlarger{\int}_a^bK(x,t)u_{\alpha}(t)\,dt = f(x)\) --- ур-е II рода, и решать стандартными методами.
 \begin{itemize}
-    \item снижение асимптотики
-    \item снижение обусловленности
-    \item итерационные методы
-\end{itemize}
-
-\subsubsection{Снижение обусловленности}
-
-\begin{enumerate}
-    \item Если \( A \) — симметричная положительно определённая \((\forall x: \text{ } x^T A x > 0 )\) \\
-    \(\underline{Th}: \exists ! \text{ неособенная нижнетреугольная матрица }C \), т.ч. \\
-    \[
-    A = CC^T \quad \text{(разложение Холецкого)}
-    \]
-
-    \underline{Доказательство:} конструктивный алгоритм построения разложения
-
-    \underline{Метод:} \( Ax = b \Rightarrow CC^T x = b \Rightarrow\)
-    \begin{align*}
-        (1) & \quad Cy = b \\
-        (2) & \quad C^T x = y \\
-    \end{align*}
-    \[
-    \text{cond}(C) = \sqrt{\text{cond}(A)} \quad \text{(по построению } C \text{)}
-    \]
-
-    \underline{Замечание:} есть модификации для несимметричных положительно определённых матриц
-
-    \item Ортогональные преобразования:
-    \[
-    \text{cond}(AB) = \| (AB)^{-1} \| \cdot \| AB \|=\|B^{-1}A^{-1}\| \cdot \|AB\| \leq
-    \]\[\leq 
-    \| A^{-1} \| \cdot \| B^{-1} \| \cdot \| A \| \cdot \| B \| \leq
-    (\| A^{-1} \| \cdot \| A \|)(\| B^{-1} \| \cdot \| B \|) = \text{cond}(A) \cdot \text{cond}(B)
-    \]
-
-    Если \( B \) — ортогональная, то
-    \(
-    \text{cond}(AB) \leq \text{cond}(A)
-    \)
-
-    \(\Rightarrow\) умножением на ортогональную матрицу можно привести исходную к более простому виду, не увеличив обусловленность
-
-    Тогда как преобразование к треугольному виду в методе Гаусса наоборот могут увеличивать число обусловленности
-
-    \underline{Th}: у любой матрицы существует QR-разложение, т.е. представление 
-    \(A = QR\), где } \(Q\) — ортогональная, \(R\) — верхне-треугольная.
-    
-    \underline{Метод построения:} метод Хаусхолдера
-    
-    Метод: \( Ax = b \Rightarrow Q(Rx) = b \Rightarrow Rx = Q^{-1} b \Rightarrow Rx = Q^{T} b \) треугольная система, \( \text{cond}(R) = \text{cond}(A) \)
-
-    Считается, что наивысшей устойчивостью обладает метод на основе сингулярного разложения
-    
-    \underline{рассмотрим систему}
-    \(
-    \begin{cases} 
-    Ax = \sigma y \\ 
-    A^Ty = \sigma x 
-    \end{cases}
-    \)
-    \rightarrow
-    \(
-    \left( \begin{array}{cc}
-    0 & A^{T} \\
-    A & 0
-    \end{array} \right)
-    \left( \begin{array}{c}
-    x \\
-    y
-    \end{array} \right) = \sigma \left( \begin{array}{c}
-    x \\
-    y
-    \end{array} \right)
-    \)
-
-    \(\text{симметричная матрица} \Rightarrow \text{неособенная} \Rightarrow \text{разрешима}\)
-
-\leftskip=0cm неотрицательные \( \sigma\) являются решениями — сингулярные числа
-
-\leftskip=3.3cm \( x \) — правый сингулярный вектор
-
-\leftskip=3.3cm \( y \) — левый сингулярный вектор  
-
-\leftskip=0cm
-
-    \underline{Th:} о сингулярном разложении
-    
-    Для \(A_{m \times n}\) существуют ортогональные матрицы \(U_{m \times m}\) и \(V_{n \times n}\), такие что
-    \[A = U \Sigma V^T, \quad \text{где} \quad \Sigma \text{ имеет вид } \Sigma = 
-    \begin{pmatrix}
-    \sigma_1 & 0 & \cdots & 0 \\ 
-    0 & \sigma_2 & \ddots  & 0 \\ 
-    \vdots & \ddots & \ddots & \vdots \\
-    0 & 0 & \cdots & \sigma_n
-    \end{pmatrix}\]
-    
-где \(\sigma_i\) — сингулярные числа (или нули)
-
-    \underline{Метод:} \(Ax=b \Rightarrow U \Sigma V^Tx=b \Rightarrow x=V \Sigma^{-1}M^Tb\), вычислений стало намного больше, но процесс более устойчив!
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (7.4,0.8) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (6.5,0.3) {%
-    \begin{minipage}{10cm}
-    тоже диагональная
-    \end{minipage}
-  };
-}
-
-\end{enumerate}
-
-\underline{Другие приложения:}
-\begin{enumerate}
-    \item близка ли матрица к особенной? \\
-    \text{идея: det}\(A\)\approx 0 \\
-    \text{проблема: det}\((aA)=a^nA\) \\
-    \text{другая идея:} \(A=U \Sigma V^T; \quad U,V \text{ — неособенные; }\)\\\( \Sigma \text{ - диагональная (и неособенная, если все сингулярные числа } > \epsilon )\)
-
-    \item ранг матрицы \\
-    \text{идея: приведение к ступенчатому виду}\\
-    \text{проблема: вычисление неустойчиво}\\
-    \text{другая идея: }\(A=U \Sigma V^T\)\\\text{ортогональное преобразование сохраняют ЛНЗ/ЛЗ}\\\text{ранг=количество ненулевых сингулярных чисел}
-
-    \item малоранговые приближения \\
-    \underline{Th:} (Эккарта-Янга)
-
-    Пусть \(r<rank(A).\text{Рассмотри все матрицы B, такие что } rank(B)=r\\\text{Tогда } min\|A-B\|_2=\|A-A_r\|\text{, где }A_r \text{ получена из } A \text{ заменой матрицы }\Sigma \text{ на } \Sigma_r \\\text{ в её сингулярном разложении, где}\)
-    \[
-    \Sigma_r = 
-    \begin{pmatrix}
-    \sigma_1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\
-    0 & \sigma_2 & \ddots & \vdots & \vdots & \ddots & \vdots\\
-    \vdots & \ddots & \ddots & \vdots & \vdots & \ddots & \vdots \\
-    0 & \cdots & \cdots & \sigma_r & \vdots & \ddots &\vdots \\
-    0 & \cdots & \cdots & \cdots & 0 & \ddots  & \vdots\\
-    \vdots & \ddots & \ddots & \ddots & \ddots & \ddots & \vdots \\
-    0 & \cdots & \cdots & \cdots & \cdots & \cdots & 0
-    \end{pmatrix}
-    \]
-    
-    \underline{Пример:} Изображение 800×533 пикселя; rank \(\approx\) (533)\\
-    Можно взять малоранговое приближение и снизить объём хранения
-\end{enumerate}
-
-\subsubsection{Снижение асимптотики}
-
-\underline{Метод прогонки} (1952, И.М.Гельфанд и О.В.Локуциевский)\\рассмотрим СЛАУ с трёхдиагональной матрицей
-
-\[
-\begin{cases} 
-\quad\quad\quad\quad b_1 x_1 + c_1 x_2= d_1 \\ 
-a_i x_{i-1}\space\space + b_i x_i + c_i x_{i+1} = d_i \\ 
-a_n x_{n-1} + b_n x_n\quad\quad\quad = d_n 
-\end{cases}
-\]
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (11,1.5) {%
-    \begin{minipage}{10cm}
-    \(2 \leq i \leq n-1\)
-    \end{minipage}
-  };
-}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (11,1.25) {%
-    \begin{minipage}{10cm}
-    \(a_1=c_n=0\)
-    \end{minipage}
-  };
-}
-
-Выразим \(x_i=\xi_{i+1} x_{i+1}+\eta_{i+1}\)
-
-Тогда \(x_{i-1}=\xi_{i}x_i+\eta_i\) и \(a_i(\xi_ix_i+\eta_i)+b_ix_i+c_ix_{i+1}=d_i\) \Rightarrow \(x_i = -\frac{c_i}{a_i \xi_i + b_i} x_{i+1} + \frac{d_i - a_i \eta_i}{a_i \xi_i + b_i} \Rightarrow\) \Rightarrow
-\[
-\left\{
-\begin{aligned}
-&\xi_{i+1} = -\frac{c_i}{a_i \xi_i + b_i} \\
-&\eta_{i+1} = \frac{d_i - a_i \eta_i}{a_i \xi_i + b_i}
-\end{aligned}
-\right.
-\]
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (4,0.8) {%
-    \begin{minipage}{10cm}
-    \( \xi_1, \eta_1 \) стоят при \( a_1 = 0 \Rightarrow\) любые значения, далее рекуррентно вычисляем \( \xi_i \), \( \eta_i \)
-    \end{minipage}
-  };
-}
-
-Далее \( \xi_{i+1} = -\frac{c_n}{a_n \xi_n + b_n}=0 \Rightarrow \) \( x_n = \xi_{n+1} x_{n+1} + \eta_{n+1} = \eta_{n+1}, \) потом рекуррентно пересчитываем \( x_i \)\\
-Вычисление \(\xi_i,\eta_i\) — \textbf{прямой ход} прогонки\\
-Вычисление \(x_i\) — \textbf{обратный ход} прогонки
-
-А что с обращением знаменателей в ноль?
-
-\underline{Th:} Если система обладает диагональным преобладанием, то метод прогонки реализуем
-
-\subsubsection{Итерационные методы}
-\underline{Основная схема:}
-
-\begin{enumerate}
-    \item приведение \(Ax=b\) к эквивалентной \(x=Cx+d\)
-    \item итерации \(x^{(k+1)}=Cx^{(k)}+d\)
-\end{enumerate}
-
-дальше детали:\\
-\underline{Th:} Указанная схема итераций сходится из любого начального приближения \(x^{(0)} \iff \iff \rho (C) < 1\\ \rho (C) \text{ - спектральный радиус матрицы \(C\) (максимальное собственное число по модулю)}\)
-
-\vspace{5mm}
-\underline{Приведение к итерационному виду:}\\
-\(Ax=b \Rightarrow x+Ax=x+b \Rightarrow x=(E-A)x+b\)\\
-\(\rho (E-A) -?\)\\
-\(\letus \lambda \text{ — собственное число } A \Rightarrow 1 - \lambda \text{ — собственное число } E-A \Rightarrow \text{ если } \lambda < 0\text{, то }\\ 1-\lambda < 1\)\\
-\(\letus |\lambda| > 2 \text{, то } |1-\lambda| > 1\)
-\[ \Rightarrow \text{ редко когда можно так преобразовать}\]
-\(\letus \Lambda \text{ — матрица-предобуславливатель } (\Lambda A)x=\Lambda b\)\\
-\(E-A \rightarrow E- \Lambda A \text{ хороший спектр}\)
-
-\vspace{5mm}
-Как выбрать \Lambda ?
-
-\begin{itemize}
-    \item \(\Lambda =A^{-1}\) - очень хороший предобуславливатель, но построить его по сложности ~ как решить систему
-    \item нет общих рекомендаций
-    \item метод расщепления матриц
-\end{itemize}
-
-\underline{Метод Ричардсона}
-
-\[x^{(k+1)}=x^{(k)}-\tau_k(Ax^{(k)}-b) \text{ выбор }\tau_k\text{ неочевиден и меняется в итерациях...}\]
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (2.25,0.5) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (0.5,0) {%
-    \begin{minipage}{10cm}
-    к-т поправки
-    \end{minipage}
-  };
-}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (3.8,1) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (3.7,0.5) {%
-    \begin{minipage}{10cm}
-    поправка
-    \end{minipage}
-  };
-}
-
-\underline{Метод Якоби}
-
-в неособенной матрице в каждой строке и столбце есть ненулевые элементы \(\Rightarrow\) переставим так, чтобы \(a_{ii} \neq 0\) 
-
-\[\sum_{j=1}^n a_{ij} x_j=b_j \Rightarrow x_i=\frac{1}{a_{ii}}(b_i-\sum_{j \neq i} a_{ij}x_j) \text{ - для квадратных матриц}\]
-\[\text{метод } x_i^{(k+1)}=\frac{1}{a_{ii}}(b_i-\sum_{j \neq i} a_{ij}x_j^{(k)}) \text{ и покомпонентные итерации...}\]
-\underline{Th:} если в системе \(Ax=b\) квадратная матрица имеет диагональное преобладание, то метод Якоби сходится при любом начальном приближении
-
-\underline{Модификация} \[x_i^{(k+1)}=\frac{1}{a_{ii}}(b_i-\sum_{j=1}^{i-1} a_{ij}x_j^{(k+1)}-\sum_{j=i+1}^n a_{ij} x_j^{(k)}) \rightarrow \text{метод Гаусса-Зейделя}\]
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (4,0.2) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (2,-0.5) {%
-    \begin{minipage}{10cm}
-    уже пересчитанные\\значения
-    \end{minipage}
-  };
-}
-
-\tikz[remember picture, overlay]{
-  \node[anchor=west] at (7,0.7) {%
-    \begin{minipage}{10cm}
-    \downarrow
-    \end{minipage}
-  };
-  \node[anchor=west] at (6.5,0) {%
-    \begin{minipage}{10cm}
-    пока старые\\значения
-    \end{minipage}
-  };
-}
-
-\vspace{5mm}
-\underline{Th:} метод Гаусса-Зейделя сходится при любом начальном приближении, если
-\begin{itemize}
-    \item матрица имеет диагональное преобладание
-    \vspace{5mm}\\
-    или
-    \vspace{1mm}
-    \item матрица симметрична и положительно определена
-\end{itemize}
+    \item ничего не доказал
+    \item привел числ. примеры
+    \item похоже, работает
+    \item я использовал
+    \item Бурова ставит под сомнения
+\end{itemize}\\
+Бывают интегральные уравнения Абеля, Урысона, бывают интегро-дифференциальные уравнения. Мы скипаем.\\
+А.В. Лебедева, В.М. Рябов <<О регулязации решения интегральных уравнений первого рода с помощью квадратурных формул>>

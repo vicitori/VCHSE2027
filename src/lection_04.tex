@@ -1,205 +1,289 @@
-\section{Лекция 4 24.03.25}
+\section{Лекция 4 31.03.25}
 
-\subsection{B-сплайны}
+\subsection{Численное дифференцирование (продолжение)}
+
+Имеем следующую формулу:
+\begin{equation}
+ f'(x_i) = \frac{f(x_{i+1}) - f(x_{i})}{h}
+\end{equation}
+Нас интересуют следующие вопросы:\\
+1) Что такое h?\\
+2) Как её выбирать?
+
+\subsubsection{Полная погрешность}
+Полная погрешность состоит из:\\
+1) Погрешность численного метода.\\
+2) Погрешность вычислений: $f_{i}\to \tilde{f}_i $ \\
+
+Пусть $\delta: |\tilde{f}_i-f_i| \leq \delta $ \\
+К тому же: $|f_{i+1}-\tilde{f}_{i+1}| \leq \delta $ \\
+
+$E(\delta,h)$ - полная погрешность $:= |\tilde{f}(x_{i})-f'(x_{i})|=|\frac{\tilde{f}_{i+1} - \tilde{f}_{i}}{h} -f'(x_{i+1})| \leq |\frac{\tilde{f}_{i+1} - \tilde{f}_{i}}{h} - \frac{f_{i+1} - f_{i}}{h}| + |\frac{f_{i+1} - f_{i}}{h} -f'(x_{i})|  \leq  |\frac{\tilde{f}_{i+1} - f_{i+1}}{h}| + |\frac{\tilde{f}_{i} - f_{i}}{h}| + |\frac{f_{i+1} - f_{i}}{h} -f'(x_{i})|  \leq \frac{2\delta}{h} + \frac{M_2}{2}h $ \\
+Погрешность $M_2$ численного метода можно получить аналогичным методом из прошлой лекции.
+
+
+Какая тут проблема?\\
+$\frac{\partial}{\partial h}(\frac{2\delta}{h} + \frac{M_2}{2}h) = \frac{-2\delta}{h^2} + \frac{M_2}{2}  \nrightarrow 0$ при $h \to 0$\\
+Получается, что нет смысла устремлять $h$ к нулю.\\
+Оптимальным значением $h$ будет $\frac{2\sqrt{\delta}}{\sqrt{M_2}}$\\
+
+
+\textbf{Пример}\\
+Для \texttt{double}: $\delta \approx 10^{-16}$, тогда оптимальная $h = 10^{-8}$
+
+\subsection{Численное интегрирование}
+Как считать определённый интеграл? Обычно мы пользуемся формулой Ньютона-Лейбница:
+\begin{equation}
+\int\limits_{a}^{b} f(x) \, dx = F(b) - F(a)
+\end{equation}
+Однако не всегда существует F.\\
+Идея:\\
+\[
+f(x) \approx \sum\limits_{i=0}^{n}f(x_k)\gamma_k(x) \Rightarrow \int\limits_{a}^{b} f(x) \, dx  =  \sum\limits_{i=0}^{n} ( \underbrace{\int\limits_{a}^{b} \gamma_k(x) \, dx}_{c_k} ) f(x_k)\\
+\]\\
 
 \begin{equation}
-    B_{j,0} = \begin{cases}  
-        1, & x_j \leq x \leq x_{j+1} \\
-        0, & \text{иначе}
-    \end{cases}
+\int_{a}^{b} f(x) \, dx  \equiv  \sum\limits_{i=0}^{n} {c_k}  f(x_k)
 \end{equation}
+Здесь $\gamma_k$ --- интегрируемые функции\\
+$c_k$ --- весовые коэффициенты\\
+(21) --- квадратурные формулы\\
 
+\textbf{Определение}\\
+Алгебраическая степени точности (АСТ) квадратурной формулы --- наибольшая степень полинома, такого, что для него формула точна. То есть:\\
+\[\int\limits_{a}^{b} f(x) \, dx  \equiv  \sum\limits_{i=0}^{n} {c_k}  f(x_k)\]
+
+
+
+\subsubsection{Как искать квадратуры:}
+Если $\gamma_k(x)$ --- полиномы, то говорят о квадратурных формулах Ньютона-Котеса.\\
+Рассмотрим квадратурные формулы при разном числе узлов.\\
+\\
+\textbf{n = 0:}\\
+\[
+\int\limits_{a}^{b} f(x) \, dx  \approx f(x_0)(b-a)
+\]
+Необходимо выбрать $x_0$. Интуитивно понятно, что подойдет $\frac{b+a}{2}$\\
+Получаем \textit{формулу средних прямоугольников}.\\
+\[
+\int\limits_{a}^{b} f(x) \, dx  \approx f(\frac{a+b}{2})(b-a)
+\]
+Теперь оценим точность.\\
+\[
+f(x) = f(\frac{a+b}{2}) +f'(\frac{a+b}{2})(x- \frac{a+b}{2}) + f''(\xi)(x- \frac{a+b}{2})^2 , \xi \in [a;b]
+\]
+\[
+R(f) = |\int\limits_{a}^{b} f(x) \, dx  - (b-a)f(\frac{a+b}{2})| = |\int\limits_{a}^{b} (f(x)-f(\frac{a+b}{2})) \, dx| =
+\]
+\[ = |\int\limits_{a}^{b} f'(\frac{a+b}{2})(x-\frac{a+b}{2}) \, dx + \int\limits_{a}^{b} f''(\xi)(x- \frac{a+b}{2})^2 \, dx| \leq |f''(\xi)|\int\limits_{a}^{b}(x- \frac{a+b}{2})^2 \, dx = \frac{M_2}{24}(b-a)^3
+\]\\
+\textbf{Замечание}\\
+Оценка достижима при $g(x) = (x-\frac{a+b}{2})^2$\\
+\\
+\textbf{Замечание}\\
+$\forall f(x) = px + q$ формула средних прямоугольников точна. Значит АСТ = 1.\\
+\\
+\\
+\textbf{n = 1:}\\
+\\
+\[P_1(x) = \frac{x-b}{a-b}f(a) + \frac{x-a}{b-a}f(b)\]\\
+\[
+\int\limits_{a}^{b} P_1(x) \, dx = \frac{f(a)}{a-b}\int\limits_{a}^{b}(x-b)dx + \frac{f(b)}{b-a}\int\limits_{a}^{b}(x-a)dx = \frac{b-a}{2}(f(a) + f(b))
+\]\\
+Получаем \textit{формулу трапеций}.\\
+\[
+\int\limits_{a}^{b} f(x) \, dx = \frac{f(a)+f(b)}{2}(b-a)
+\]\\
+Аналогично можно показать достижимость оценки $|R(x)| \leq \frac{M_2}{2}(b-a)^3$ при $g(x) = (x-a)^2$.\\
+\textbf{Замечание}\\
+АСТ = 1, несмотря на то, что узлов больше.\\
+\textbf{n = 2:}\\
+$x_0 = a; x_1 = \frac{a+b}{2}; x_2 = b$\\
+$[a;b] \to [0;\omega]$\\
+$P(x) = c_0+c_1x+ c_2x^2$\\
+Имеем следующие точки:
+\[
+(0;f(a)), (\frac{\omega}{2};f(\frac{a+b}{2})), (\omega;f(b))
+\]
+\[
+\begin{cases}
+c_0 = f(a)\\
+c_0 + c_1\frac{\omega}{2} + c_2\frac{\omega^2}{4} = f(\frac{a+b}{2})\\
+c_0 + c_1\omega + c_2\omega^2 = f(b)\\
+\end{cases}
+\overset{(2)\cdot4+(1)+(3)}{\to}
+6c_0 + 3c_1\omega+2c_2\omega^2=f(a) +4f(\frac{a+b}{2}) + f(b)
+\]
+\[
+\int\limits_{a}^{b} f(x) \, dx \approx  \int\limits_{a}^{b}(c_0+c_1x+c_2x^2)dx =c_0\omega+c_1\frac{\omega^2}{2} + c_2\frac{\omega^3}{3} = \frac{\omega}{6}(6c_0+3c_1\omega+2c_2\omega^2) =
+\]
+\[
+=\frac{b-a}{6}(f(a)+4f(\frac{a+b}{2}) + f(b))
+\]
+Получили \textit{квадратурную формулу Симпсона}.\\
+\[
+\int\limits_{a}^{b} f(x) \, dx \approx\frac{b-a}{6}(f(a)+4f(\frac{a+b}{2}) + f(b))
+\]
+\textbf{Утверждение}\\
+АСТ квадратурной формулы Симпсона = 3\\
+\[
+|R(f)| \leq \frac{M_4}{2880}(b-a)^3
+\]
+Как быстрее повышать степень?\\
+\subsubsection{Квадратурные формулы Гаусса.}
+Идея: Управлять не только весами, но и узлами.\\
+Выберем узлы и веса так, чтобы максимизировать АСТ.\\
+\[
+\int_{a}^{b} f(x) \, dx  =  \sum\limits_{i=1}^{n} {c_k}  f(x_k)
+\]
+\textit{Нумерация с 1!}\\
+Точность: $1,x,x^2,...,x^m$\\
+\\
+$
+\begin{cases}
+ \sum\limits_{i=1}^{n} {c_k}x^l_k = \frac{1}{l+1}(b^{l+1}-a^{l+1})\\
+l=0,1,...,m
+\end{cases}$\\
+\\
+Имеем 2n неизвестных и m+1 уравнений.\\
+Тогда при m = 2n - 1 существует решение.\\
+\\
+\textbf{Утверждение}\\
+Наивысшая АСТ квадратурной формулы построенной по n узлам не превосходит 2n - 1.\\
+\\
+Доказательство:\\
+\[
+g(x) = ((x-x_1)...(x-x_n))^2; \, deg(g(x)) = 2n
+\]
+\[
+\int\limits_{a}^{b} g(x) \, dx > 0, \,g(x_k) = 0 \Rightarrow  \sum = 0
+\,\,\,\,\,\,\,\,\,\,\,\,\,\blacksquare
+\]\\
+Как влияет выбор узлов на АСТ?
+\[
+\begin{array}{|c|c|c|}
+\hline
+\text{2 узла} & \text{Трапеции: 1} & \text{Гаусс: 3} \\
+\hline
+\text{3 узла} & \text{Симпсон: 3} & \text{Гаусс: 5}  \\
+\hline
+\end{array}
+\]\\
+\textbf{Утверждение}\\
+Погрешность для квадратурной формулы Гаусса с 2 узлами:\\
+\[
+|R(f)| \leq \frac{M_4}{4320}(b-a)^5
+\]\\
+\textbf{Простейшие квадратурные формулы Гаусса}:\\
+$\textbf{n=1} \Rightarrow m = 2n- 1= 1$\\
+\[
+\begin{cases}
+c_1 = b -1\\
+c_1x_1 = \frac{1}{2}(b^2-a^2)
+\end{cases} \Rightarrow
+\begin{cases}
+c_1 = b -1\\
+c_1x_1 = \frac{1}{2}(a+b)
+\end{cases}
+\]
+\[
+\int\limits_{a}^{b} f(x)\,dx = (b-a)f(\frac{a+b}{2})
+\]
+Получили формулу средних прямоугольников.\\
+\\
+$\textbf{n=2}\Rightarrow m = 2n- 1= 3$\\
+\[
+\begin{cases}
+c_1 + c_2 = b - a\\
+c_1x_1 + c_2x_2 = \frac{1}{2}(b^2-a^2)\\
+c_1x^2_1 + c_2x^2_2 = \frac{1}{3}(b^3-a^3)\\
+c_1x^3_1 + c_2x^3_2 = \frac{1}{4}(b^4-a^4)
+\end{cases} \Rightarrow
+\int\limits_{a}^{b} f(x)\,dx \approx \frac{b-a}{2}(f(x_1)+f(x_2));\,x_{1,2} = \frac{a+b}{2} \pm \frac{\sqrt{3}}{6}(b-a)
+\]
+Получили почти формулу трапеций, только в специальных узлах.\\
+
+\textbf{Теорема}\\
+Квадратурная формула Гаусса, построенная по n узлам, обладает наивысшей АСТ $\Leftrightarrow 2n-1 \Leftrightarrow\\$
+1) Это интерполяционная квадратурная формула\\
+2) Её узлы $x_1,..,x_k$ являются корнями многочлена:\\
+$\omega(x) = (x-x_1)(x-x_2)...(x-x_k)$ такого, что:\\
+$\forall q(x): \, deg(q(x)) \leq n-1 :\, \int\limits_{a}^{b}\omega(x)q(x) = 0$\\
+\\
+Откуда брать $q(x)$? Полиномы Лежандро (формула Родрига)\\
+$L_n(x) = \frac{1}{2^nn!}\frac{d^n}{dx^n}(x^2-1)^n, \,x\in[-1;1]$\\
+\\
+Докажем ортогональность:\\
+Пусть $\psi(x) = (x^2-1)^n$
+\[
+\psi^{(k)}(-1) = \psi^{(k)}(1) = 0 \Rightarrow L_n(x) = \frac{1}{2^nn!}\psi^{(n)}(x)
+\]
+$\exists Q(x) \in C^n[-1;1]$
+\[
+\int\limits_{-1}^{1} Q(x)L_n(x)\,dx = \frac{1}{2^nn!}\int\limits_{-1}^{1} Q(x)\psi^{(n)}(x)\,dx = \frac{1}{2^nn!}\int\limits_{-1}^{1} Q(x)\,d(\psi^{(n-1)}(x)) =
+\]
+\[
+= \frac{1}{2^nn!}\left(Q(x)\psi^{(n-1)}(x)\bigg |^1_{-1}-\int\limits_{-1}^{1} Q'(x)\psi^{(n-1)}(x)\,dx\right) =
+\]
+\[
+= -\frac{1}{2^nn!}\int\limits_{-1}^{1} Q'(x)\psi^{(n-1)}(x)\,dx = \, ...\, =(-1)^n\frac{1}{2^nn!}\int\limits_{-1}^{1} Q^{(n)}(x)\psi(x)\,dx
+\]
+Пусть $Q(x)$ --- полином, $deg(Q(x)) \leq n-1$\\
+\[
+Q^{(n)}(x) = 0 \Rightarrow \int\limits_{-1}^{1} Q^{(n)}(x)\psi(x)\,dx =0 \Rightarrow \int\limits_{-1}^{1} L_n(x)Q(x)\,dx = 0
+\]
+\textbf{Вывод}: Оптимальные узлы для квадратичной формулы Гаусса - корни полинома Лежандро.\\
+$P_2(x) = \frac{1}{2}(3x^2-1)$\\
+$P_3(x) = \frac{1}{8}(63x^5-70x^3+15x)$\\
+$\dots$\\
+$\underset{[a;b]}{X_k} = \frac{1}{2}(a+b) +\frac{1}{2}(b-a)\underset{[-1;1]}{X_k}$\\
+$\underset{[a;b]}{C_k}=\frac{1}{2}(b-a)\underset{[-1;1]}{C_k}$\\
+Извстно, что $C_k = \frac{2}{(1-x^2_k)(L'_n(x_k))^2}$ \textit{Символы Кристоффеля (1858))} \\
+\\
+Существуют также формулы Филона для быстро осциллирующих функций.
+\subsubsection{Несобственные интегралы:}
+\[
+\int\limits_{a}^{b} f(x) \, dx = \frac{f(a)+f(b)}{2}(b-a) \approx \{[a;b] = \bigcup[x_i;x_{i+1}]\} \approx \sum\limits_{i=0}^{n-1}\frac{f(x_i)+f(x_{i+1})}{2}(x_{i+1}-x_i) \approx
+\]\\
+\[
+\approx \{x_{i+1}-x_i=h -const\} \approx h(\frac{f_0+f_n}{2} + \sum\limits_{i=0}^{n-1}f(x_i))\approx h(c_0 + \sum\limits_{i=0}^{n-1}f(a+ih)) \Rightarrow
+\]
 \begin{equation}
-    B_{j,d}(t) = \frac{t - x_j}{x_{j+d} - x_j} \cdot B_{j, d-1}(t) + 
-    \frac{x_{j+d+1} - t}{x_{j+d+1} - x_{j+1}} \cdot B_{j+1, d-1}(t)
+\Rightarrow \int\limits_{-\infty}^{\infty} f(x) \, dx = h\sum\limits_{i=-\infty}^{\infty}f(ih)
 \end{equation}
-
-\begin{equation}
-    B_{j,1}(t) = \frac{t - x_j}{x_{j+1} - x_j} \cdot B_{j, 0}(t) +
-        \frac{x_{j+2} - t}{x_{j+2} - x_{j+1}} \cdot B_{j+1, 0}(t) = \begin{cases}
-        \frac{t - x_j}{x_{j+1} - x_j}, & x_j \leq t \leq x_{j+1}\\
-        \frac{x_{j+2} - t}{x_{j+2} - x_{j+1}}, & x_{j+1} \leq t \leq x_{j+2}\\
-        0, & \text{иначе}
-    \end{cases}
-\end{equation}
-
-\begin{equation}
-    B_{j,2}(t) = \begin{cases}
-        \frac{(t - x_j)^2}{(x_{j+1} - x_j) \cdot (x_{j+2} - x_j)}, & t \in [x_j; x_{j+1}]\\
-        \text{более сложный квадратичный многочлен}, & t \in [x_{j+1}; x_{j+2}]\\
-        \frac{(t - x_{j+3})^2}{(x_{j+3} - x_{j+1}) \cdot (x_{j+3} - x_{j+2})}, & t \in [x_{j+2}; x_{j+3}]
-    \end{cases}
-\end{equation}
-
-При приближении к краям начинаются проблемы. Способы решения: 1) не будем строить сплайны, тогда потеряем качество аппроксимации на краях; 2) дополнить сетку фиктивными узлами (по два слева и справа).
-
-\textbf{Утв.}
-\begin{enumerate}
-    \item $B_{j,d}(t)$ зависит только от узлов $ x_j, x_{j+1}, ..., x_{j+d+1} $.
-    \item $ B_{j,d}(t) = 0 $ при $ x \in [x_j; x_{j+1}] $.
-    \item $ \forall x \in (x_j; x_{j+1}) B_{j,d}(t) > 0 $.
-    \item $ B_{j,d}(t) \in C^{d-1}[a; b] $.
-    \item $ \sum_{i=-2}^{n-1} B_{i,d}(t) = 1 $.
-\end{enumerate}
-
-\textbf{Как строить приближение?}
-
-$ \tilde{f}(x) = \sum_{j=-2}^{n-1} c_j B_{j,2}(t) $.
-При $ t \in [x_j; x_{j+1})\ \tilde{f}(x) = \sum_{k=j-2}^{j} c_j B_{k,2}(t) $.
-
-Как выбрать $c_j$? Целая теория...
-
-$ x^*_j = \frac{x_{j+1} + x_{j+1} + ... + x_{j+d}}{d} $ - точки Гревилля.
-
-$ \tilde{f}(x) = \sum_{j \in \mathbb{Z}} f(x^*_j) B_{j,d}(t) $ $\to$ \textbf{variation dimishing approximation}.
-
-\subsubsection{Свойства аппроксимации}
-
-\begin{enumerate}
-    \item 
-        $\forall x \in \mathbb{R}\ \ f_{min} \leq \tilde{f}(x) \leq f_{max}$
-        \begin{equation}
-            \tilde{f}(x) = \sum_i c_i B_{i,d}(x) \leq \sum_i c_{max} B_{i,d}(x) \leq c_{max} \sum_i B_{i,d}(x) = c_{max}
-        \end{equation}
-        \begin{equation}
-            \tilde{f}(x) \geq c_{min}
-        \end{equation}
-        \begin{equation}
-            f_{min} \leq f(x_{j_{min}}) \leq \sum_i f(x^*_j) B_{i,d}(x) \leq f(x_{j_{max}}) \leq f_{max}
-        \end{equation}
-    \item
-        Если $f$ монотонна, то $\tilde{f}$ сохраняет монотонность.
-        
-        \textbf{Лемма.} 
-        $ g = \sum_{i} c_i B_i(x) $, $ c_i \leq c_{i+1} $ $\Rightarrow$ $g$ не убывает.
-
-        \begin{equation}
-            g'(x) = \sum_{i} \frac{c_i - c{i-1}}{x_{i+d} - x_{i}} \geq 0 \Rightarrow g'(x) \geq 0
-        \end{equation}
-        \begin{equation}
-            x^*_j \leq x^*_{j+1} \Rightarrow^{f \text{-мон}} f(x^*_j) \leq f(x^*_{j+1}) \Rightarrow \tilde{f} \text{ - не убывает}
-        \end{equation}
-    \item
-        Если $f$ выпукла(вогнута), то $\tilde{f}$ сохраняет гладкость.
-\end{enumerate}
-
-$\Rightarrow$ построена формосохраняющая аппроксимация. Как расширить теорию? 
-\begin{itemize}
-    \item сохранить гладкость склейки
-    \item сохранить локальность носителя
-    \item не полиномы на отрезках
-\end{itemize}
-
-GB-сплайны, NUAT B-сплайны, минимальные сплайны.
-
-\subsection{Численное дифференцирование}
-
-\subsubsection{Метод неопределенных коэффициентов}
-
-\begin{equation}
-    f^{(k)}(x) = \sum_{i=0}^{p} c_i f(x_i)
-\end{equation}
-
-Потребуем точности на наборе функций:
-
-$ f(x) = 1 \Rightarrow f^{(k)}(x) = 0 $
-
-$ f(x) = x \Rightarrow f^{(k)}(x) = 0 $
-
-$ f(x) = x^{k-1} \Rightarrow f^{(k)}(x) = 0 $
-
-$ f(x) = x^k \Rightarrow f^{(k)}(x) = k! $
-
-$ f(x) = x^p \Rightarrow f^{(k)}(x) = p (p - 1) ... (p - k + 1) x^{p - k} $
-
-\begin{equation}
-    \begin{cases}
-        c_0 + c_1 + ... + c_p = 0\\
-        c_0 x_0 + c_1 x_1 + ... + c_p x_p = 0\\
-        c_0 x_0^{k-1} + c_1 x_1^{k-1} + ... + c_p x_p^{k-1} = 0\\
-        c_0 x_0^k + c_1 x_1^k + ... + c_p x_p^k = k!\\
-        c_0 x_0^p + c_1 x_1^p + ... + c_p x_p^p = p (p - 1) ... (p - k + 1) x^{p - k}
-    \end{cases}
-\end{equation}
-
-Матрица системы - транспонированная матрица Вандермонда.
-
-\subsubsection{Альтернативный метод}
-
-$ f'(x_i) \leadsto P'_i(x_i) $.
-Дано: $ f(x_i) := f_i $, $ f(x_{i-1}) := f_{i-1} $.
-
-\begin{equation}
-    P_i(x) = \frac{x - x_i}{x_{i-1} - x_i} f_{i-1} + \frac{x - x_{i-1}}{x_i - x_{i-1}} f_i
-\end{equation}
-
-\begin{equation}
-    P_i(x) = \frac{f_i - f_{i-1}}{x_i - x_{i-1}} x + \frac{f_{i-1} x_i - f_i x_{i-1}}{x_i - x_{i-1}}
-\end{equation}
-
-\begin{equation}
-    P_i'(x) = \frac{f_i - f_{i-1}}{x_i - x_{i-1}} = \frac{f_i - f_{i-1}}{h}
-\end{equation}
-
-$ \Rightarrow f'(x_i) \approx \frac{f_i - f_{i-1}}{h} $, 
-$ \Rightarrow f'(x_i) \approx \frac{f_{i+1} - f_i}{h} $ $\Rightarrow$ 
-$ f'(x_i) \approx \frac{f_{i+1} - f_{i-1}}{2h} $.
-
-\begin{equation}
-    P_i(x) = \frac{(x - x_i)(x - x_{i+1})}{(x_{i-1} - x_i)(x_{i-1} - x_{i+1})} f_{i-1} + 
-        \frac{(x - x_{i-1})(x - x_{i+1})}{(x_i - x_{i-1})(x_i - x_{i+1})} f_i + 
-        \frac{(x - x_{i-1})(x - x_i)}{(x_{i+1} - x_{i-1})(x_{i+1} - x_{i-1})} f_{i+1}
-\end{equation}
-
-\begin{equation}
-    P_i'(x) = \frac{2x - x_i - x_{i+1}}{h_i(h_i + h_{i+1})} f_{i-1} -
-        \frac{2x - x_{i-1} - x_{i+1}}{h_i h_{i+1}} f_i + 
-        \frac{2x - x_{i+1} - x_i}{h_{i+1}(h_i + h_{i+1})} f_{i+1}
-\end{equation}
-
-Пусть $ h_i = h = const $. 
-
-$ x = x_i $ : $ f'(x_i) = \frac{f_{i+1} - f_{i-1}}{2h} $ - центральная разностная производная.
-
-$ x = x_{i-1} $ - сдвиг .. : $ f'(x_i) = \frac{- 3 f_i + 4 f_{i+1} - f_{i+2}}{2h} $ - правая разностная производная.
-
-$ x = x_{i+1} : f'(x_i) = \frac{f_{i-2} - 4 f_{i-1} + 3 f_i}{2h} $ - левая разностная производная.
-
-\begin{equation}
-    P_i''(x) = \frac{2}{h_i(h_i + h_{i+1})} f_{i-1} -
-        \frac{2}{h_i h_{i+1}} f_i + 
-        \frac{2}{h_{i+1}(h_i + h_{i+1})} f_{i+1}
-\end{equation}
-
-$ f''(x_i) \approx \frac{f_{i-1} - 2 f_i + f_{i+1}}{h^2} $
-
-\subsubsection{Насколько хорошо это работает?}
-
-\textbf{Опр.}
-Численный метод имеет порядок точности $p$, если на равномерной сетке с шагом $h$ погрешность есть $O(h^p)$.
-
-Оценим погрешность $ f'(x_i) \approx \frac{f_{i+1} - f_{i-1}}{2h} $.
-
-Пусть $ f \in C^3[x_{i-1}; x_{i+1}] $. $ \tilde{f}' = \frac{1}{2h} (
-    (f(x_i) + h f'(x_i) + \frac{h^2}{2} f''(x_i) + \frac{h^3}{6} f'''(\xi_1)) - 
-    (f(x_i) - h f'(x_i) + \frac{h^2}{2} f''(x_i) - \frac{h^3}{6} f'''(\xi_2)) 
-) = f'(x_i) + \frac{h^2}{12} (
-    f'''(\xi_1) + f'''(\xi_2)
-); \xi_1, \xi_2 \in (x_{i-1}; x_{i+1}) $ $\Rightarrow$
-$ | \tilde{f}'(x_i) - f'(x_i) | \leq \frac{h^2}{12} | f'''(\xi_1) + f'''(\xi_2) | \leq \frac{M_3}{6} h^2, M_3 = \max_{\xi \in (x_{i-1}; x_{i+1})} | f'''(\xi) | $ 
-$\Rightarrow$ порядок метода равен 2.
-
-Если нет нужной гладкости, возможны нежелательные эффекты.
-
-\textbf{Пример.}
-\begin{equation}
-    g(x) = \begin{cases}
-        x^2, & x \geq 0\\
-        -x^2, & x < 0 
-    \end{cases} = x |x|
-\end{equation}
-
-Гипотеза: $ g'(0) \approx \frac{g(h) + g(-h)}{2h} $ имеет второй порядок сходимости, но $ g''(0) \approx \frac{g(h) + g(-h)}{2h} = \frac{h^2 + h^2}{2h} = h $. $ g''(0) \to_{h \to 0} 0 $ только с первом порядком. Все потому что $ g(x) \in C[a; b] $, но $ g(x) \notin C^2 [a; b] : g'(x) = \begin{cases}
-    -2 |x|, & x \not = 0 \\
-    \lim_{x \to 0} \frac{x |x|}{x} = 0, & x = 0
-\end{cases} $.
+(22) --- формула трапеций  для бесконечного случая.\\
+Теперь рассмотрим$\int\limits_{-1}^{1} f(x) \, dx $ с особенностями в -1 и 1.\\
+\[
+x = th(\frac{t}{2}) = \frac{e^{\frac{t}{2}}-e^{-\frac{t}{2}}}{e^{\frac{t}{2}} + e^{-\frac{t}{2}}} = \frac{e^t-1}{e^t+1}; \,dx = \frac{2e^t}{(e^t+1)^2}dt
+\]
+\[
+\int\limits_{-1}^{1} f(x) \, dx = \int\limits_{-\infty}^{\infty} f(\frac{e^t-1}{e^t+1}) \, d\left(\frac{e^t-1}{e^t+1}\right) = 2\int\limits_{-\infty}^{\infty} f(\frac{e^t-1}{e^t+1}) \, \frac{e^t}{(e^t+1)^2}dt = 2h \sum\limits_{i=-\infty}^{\infty}f(\frac{e^{ih}-1}{e^{ih}+1})\frac{e^{ih}}{(e^{ih}+1)^2}
+\]
+Получили квадратурную формулу Стенжера.\\
+\[
+\int\limits_{-1}^{1} f(x) \, dx  \approx \sum\limits_{i=-N}^{N}f(\frac{e^{i}-1}{e^{i}+1})\frac{e^{i}}{(e^{i}+1)^2}
+\]
+Известно, что ошибка пропорциональна $O(e^{-\pi\sqrt{N}})$
+\subsubsection{Кратные интегралы:}
+\textbf{1)}
+$
+G = \begin{cases}
+a\leq x\leq b\\
+c\leq y \leq d
+\end{cases}
+$
+\[
+\iint\limits_{D} f(x,y) \, dx \, dy = \int\limits_{a}^{b}dx\int\limits_{c}^{d}f(x,y)\,dy \overset{Симпсон}{=} \frac{b-a}{6}\left(\int\limits_{c}^{d}f(a,y)\,dy + 4\int\limits_{c}^{d}f(\frac{a+b}{2},y)\,dy + \int\limits_{c}^{d}f(b,y)\,dy\right)
+\]
+Отдельно применяем формулу Симпсона для каждого интеграла.\\
+\\
+\textbf{2)}
+$G \subset 	\mathbb{R}^2$\\
+Можем приближать исходную область прямоугольниками.\\
+Можем делать интерполяцию f(x,y).\\
+\\
+\textbf{3)}
+$G \subset 	\mathbb{R}^3$\\
+Метод Люстерника и Фиткина.\\
+М.П. Мысовских "Интерполяционные кубаторные формулы".\\
+Метод Монте-Карло.
